@@ -1,0 +1,101 @@
+\section*{Methods}
+
+\subsection*{Stochastic multi-UAV delivery environment}
+
+We simulate a square urban district (Fig.~\ref{fig:map}) of side $L=1600$~m containing four landing pads and $N_b=30$ cylindrical building obstacles with radii drawn uniformly from $[15,40]$~m. A fleet of $N=6$ cooperative delivery aircraft (12 under the traffic shift) operates alongside $N_i=4$ non-cooperative intruders (10 under the traffic shift) that fly at $4$--$10$~m~s$^{-1}$ and change heading with probability $0.01$ per second. Each aircraft starts at a pad, flies to a customer location drawn $600$--$1100$~m away, hovers for $T_d=10$~s to release the parcel, and returns to the nearest pad, where landing takes $T_l=8$~s. The simulation advances in steps of $\Delta t=1$~s and an episode ends when every aircraft has terminated or after $T_{\max}=300$~s.
+
+Motion is planar. Writing $v_t$ for airspeed, $w_t$ for the local wind and $a_t\in[-1,1]^2$ for the commanded action, the airspeed evolves as
+\begin{equation}
+v_{t+1} = v_t + \mathrm{clip}\!\left(v_{\max} R(\theta_t) a_t - v_t,\; a_{\max}\Delta t\right), \qquad p_{t+1} = p_t + (v_{t+1} + w_t)\,\Delta t ,
+\end{equation}
+with $v_{\max}=20$~m~s$^{-1}$, $a_{\max}=6$~m~s$^{-2}$ and $R(\theta_t)$ the rotation that maps the goal frame, in which the policy acts, into the world frame. Electrical power (Fig.~\ref{fig:power}) follows the rotary-wing model of Zeng et al.\cite{zeng2019energy} with momentum-theory scaling for the total mass $m$,
+\begin{equation}
+P(v,m) = P_0\!\left(1+\frac{3v^2}{U_{\mathrm{tip}}^2}\right) + P_{i}\,\omega^{3/2}\sqrt{\frac{1}{\sqrt{1+x^2}+x}} + \tfrac{1}{2} d_0 \rho s A v^3, \quad x=\frac{v^2}{2 v_0^2 \omega},\;\; \omega=\frac{m}{m_0},
+\label{eq:power}
+\end{equation}
+with $P_0=79.86$~W, $P_i=88.63$~W, $U_{\mathrm{tip}}=120$~m~s$^{-1}$, $v_0=4.03$~m~s$^{-1}$, $d_0=0.6$, $\rho=1.225$~kg~m$^{-3}$, $s=0.05$, $A=0.503$~m$^2$ and empty mass $m_0=2$~kg. The energy drawn in one step is
+\begin{equation}
+\Delta E_t = f_t\,P(\lVert v_t\rVert, m_t)\left(1+\kappa_{\mathrm{turb}}\frac{\lVert w_t-\bar w\rVert}{5}\right)\Delta t + \frac{\max(\Delta K_t,0)}{\eta_a},
+\end{equation}
+where $\Delta K_t$ is the change in kinetic energy, $\eta_a=0.75$, $\kappa_{\mathrm{turb}}=0.1$, and $f_t\ge 1$ is a fault multiplier. Usable battery energy is drawn from $\mathcal{U}(24,50)$~kJ and payload mass from $\mathcal{U}(0.2,1.2)$~kg. With probability $1/3000$ per aircraft-second a propulsion or battery fault raises $f_t$ to $1.25$--$1.6$ and instantaneously removes $5$--$15\%$ of the remaining energy.
+
+Four exogenous disturbance processes act on every episode. Wind consists of a district-wide mean of magnitude $\mathcal{U}(0,6)$~m~s$^{-1}$ and uniformly random direction, an Ornstein--Uhlenbeck turbulence component with time constant $10$~s and standard deviation $0.3+0.17\lVert\bar w\rVert$, and discrete one-cosine gusts\cite{milhdbk1797} triggered at rate $1/150$ per aircraft-second with amplitude $3$--$8$~m~s$^{-1}$ and duration $4$--$10$~s. Position is known only through a satellite-navigation estimate corrupted by an Ornstein--Uhlenbeck error of standard deviation $2$~m and time constant $20$~s, plus multipath offsets of $8$--$20$~m that appear with probability $0.005$ per step and persist for $3$--$10$~s\cite{zhu2018gnss}. Wind is estimated on board by a first-order innovation filter driven by noisy measurements with standard deviation $1$~m~s$^{-1}$. Intruders are detected within $250$~m with miss probability $0.05$ and relative measurement noise $0.02$; cooperative fleet members broadcast their states.
+
+Each aircraft observes a 59-dimensional vector expressed in its goal frame: distance to the current goal, a return-phase flag, airspeed and ground speed, the wind estimate and its innovation standard deviation, remaining energy, the energy margin defined below, payload mass, the relative position of the nearest pad, elapsed time fraction, the four nearest buildings (relative position, radius, clearance) and the four nearest aircraft (relative position, relative velocity, clearance, a cooperative flag and a presence flag). From the same quantities we form four hazard cues that are used only by the risk-regulation mechanisms:
+\begin{equation}
+h_c = \max_j \left(1-\frac{t^j_{\mathrm{cpa}}}{\tau_h}\right)\left(1-\frac{d^j_{\mathrm{cpa}}}{30}\right)_{\!+}\!\!, \quad
+h_e = \left(\frac{0.5-\mu_t}{0.5}\right)_{\!+}\!\!, \quad
+h_d = \frac{|\{j: d_j<150\}|}{4}, \quad
+h_w = \left(\frac{\hat\sigma_w-1}{3}\right)_{\!+}\!\!,
+\label{eq:cues}
+\end{equation}
+all clipped to $[0,1]$, where $t^j_{\mathrm{cpa}}$ and $d^j_{\mathrm{cpa}}$ are the time to and distance at closest approach with obstacle or aircraft $j$ over a horizon $\tau_h=10$~s, $\mu_t$ is the energy margin, and $\hat\sigma_w$ is the estimated wind innovation scale. The cues capture, in order, collision threat, energy pressure, local traffic density and disturbance intensity.
+
+The step reward combines progress, energy, time, proximity and terminal events,
+\begin{equation}
+\begin{split}
+r_t = {}& 0.01\,\Delta d_t - 0.08\,\frac{\Delta E_t}{10^3} - 0.01 - 0.3\min(\rho_t,5) - 0.1(-\mu_t)_+ \\
+& + 8\,\mathbb{1}[\text{drop}] + b_l\,\mathbb{1}[\text{landing}] - 30\,\mathbb{1}[\text{collision or depletion}] - 20\,\mathbb{1}[\text{out of bounds}],
+\end{split}
+\label{eq:reward}
+\end{equation}
+where $\Delta d_t$ is the reduction in distance to the goal in metres, $\rho_t=\sum_j (1-d_j/25)^2_+$ penalises separations below $25$~m, and $b_l$ is $8$ after a completed delivery and $2$ after a return without delivery. Missions terminate as delivered and landed, returned without delivering, building collision, aircraft collision, energy depletion, out of bounds, or timeout. We define the catastrophic loss rate as the fraction of missions ending in a collision, energy depletion or an airspace exit, and treat it as the primary safety metric.
+
+Table~\ref{tab:env} lists the parameters. Distribution shift is applied only at test time through four families, each interpolated by a severity $s\in[0,1]$ between the nominal and the shifted setting: wind (mean wind $5$--$10$~m~s$^{-1}$, stronger turbulence, gusts every $60$~s with amplitude $5$--$10$~m~s$^{-1}$), sensor (satellite-navigation error $5$~m, multipath probability $0.03$ with $15$--$40$~m offsets, wind measurement noise $2$~m~s$^{-1}$, intruder miss probability $0.2$), traffic (12 cooperative aircraft, 10 intruders, faster and more manoeuvrable), and energy (battery $18$--$40$~kJ, payload $1.0$--$1.8$~kg, fault rate $1/750$). A compound condition applies all four families at $s=0.5$.
+
+\subsection*{Learning agents}
+
+All agents are trained as a decentralised partially observable Markov decision process with parameter sharing: one network is used by every aircraft, which acts on its own observation. We compare three risk-neutral baselines, the soft actor-critic\cite{haarnoja2018sac}, TD3\cite{fujimoto2018td3} and PPO with generalised advantage estimation\cite{schulman2017ppo,schulman2016gae}, and three distributional agents that differ only in how risk enters the actor objective.
+
+The distributional agents use twin quantile critics with $N_q=25$ atoms each and truncation of the two largest atoms per critic, as in truncated quantile critics\cite{kuznetsov2020tqc}, trained with the quantile Huber loss\cite{dabney2018qr}. Writing $Z_\phi(o,a;\alpha)$ for the pooled return atoms and $\mathrm{CVaR}^-_\alpha$ for the mean of the lowest $\alpha$-fraction of atoms\cite{rockafellar2000cvar}, the risk-neutral agent DSAC-N maximises the mean of the atoms, and the fixed-risk agent DSAC-CVaR maximises $\mathrm{CVaR}^-_{0.25}$, which is the form used by risk-conditioned and worst-case actor-critic methods for navigation\cite{choi2021rcdsac,yang2021wcsac,ma2025dsac}. Both are conditioned on the risk level through an extra network input, so a single policy covers a continuum of risk levels\cite{choi2021rcdsac}.
+
+The proposed agent, CREST, exists in two forms that place the tail-risk measure at different points. CREST-R applies $\mathrm{CVaR}^-_{\alpha_t}$ to the return distribution, with a risk level $\alpha_t$ that changes with the hazard cues rather than remaining fixed. CREST-C keeps an expected-return critic and adds a second pair of quantile critics $Z^c_\psi(o,a;\alpha)$ for the discounted catastrophe cost $c_t=\mathbb{1}[\text{collision, depletion or airspace exit at step } t]$; the actor then solves
+\begin{equation}
+\min_\theta\; \mathbb{E}\Big[\,\alpha_{\mathrm{ent}}\log\pi_\theta(a|o,\alpha_t) - \overline{Z_\phi(o,a;\alpha_t)} + \beta\,\mathrm{CVaR}^+_{\alpha_t}\!\big(Z^c_\psi(o,a;\alpha_t)\big)\Big],
+\label{eq:crestc}
+\end{equation}
+where $\overline{(\cdot)}$ is the mean over atoms, $\mathrm{CVaR}^+$ is the upper-tail average and $\beta=10$. Because $c_t$ is an indicator, the upper-tail average of its discounted sum is approximately the probability of a catastrophic event divided by $\alpha$ whenever that probability is below $\alpha$, so the risk level acts as a magnifier of catastrophe probability rather than as a general pessimism knob.
+
+In both forms the risk level is set by the hazard-adaptive schedule
+\begin{equation}
+H_t = 1-(1-h_c)(1-0.6\,h_e)(1-0.4\,h_d)(1-0.5\,h_w), \qquad \alpha_t = \alpha_{\min} + (\alpha_b-\alpha_{\min})(1-H_t),
+\label{eq:schedule}
+\end{equation}
+with $\alpha_{\min}=0.1$ and a base level $\alpha_b$ that is selected once on nominal validation districts. The schedule is monotone: $\alpha_t$ decreases in every cue, so conservatism increases with collision threat, energy pressure, traffic density and disturbance intensity, and $\alpha_t\in[\alpha_{\min},\alpha_b]$ always.
+
+Two training devices support risk-sensitive learning. Following the soft-risk idea of Greenberg et al.\cite{greenberg2022cesor}, the effective risk level is annealed from risk neutrality, $\alpha^\rho_t = 1-\rho(t)(1-\alpha_t)$ with $\rho$ increasing linearly over the first $40\%$ of training, which prevents the early policy from becoming blind to successful strategies. Because the networks are risk-conditioned, we also relabel the risk level of replayed transitions: the hazard cues of both states and the episode base level are stored, and at every update a fresh base level is drawn from $\mathcal{U}(0.1,1)$ and the schedule is re-evaluated, so a single replay buffer trains the whole family of risk levels.
+
+Table~\ref{tab:hyper} lists the training and evaluation settings. Every agent is trained for $25{,}000$ environment steps with 16 districts in parallel, which is $2.4\times 10^6$ aircraft transitions, with four gradient updates of batch size $256$ per environment step, Adam at $3\times 10^{-4}$, discount $0.99$, target smoothing $0.005$, two hidden layers of 128 units, a replay buffer of $4\times 10^5$ transitions and an entropy target of $-2$ nats. Three training seeds are used for every agent. CREST is trained with its own online conformal reserve active, and the baselines with the conventional fixed reserve; at evaluation time every policy is run under every reserve so that policy and reserve effects can be separated.
+
+\subsection*{Calibrated return-to-home energy reserves}
+
+A delivery aircraft must keep enough energy to reach a pad and land. Let $\hat p_t$ be the estimated position, $\hat w_t$ the estimated wind, $e$ the unit vector towards the nearest pad at distance $d_t$, and $m$ the current mass. The nominal return energy uses the energy-optimal airspeed over a candidate set $\mathcal{V}=\{8,10,\dots,20\}$~m~s$^{-1}$,
+\begin{equation}
+\hat E(w) = \min_{v\in\mathcal{V}} \frac{P(v,m)\,\varphi\, d_t}{\max\!\big(w^\top e + \sqrt{v^2-(w^\top e^\perp)^2},\,1\big)} , \qquad \varphi = 1.15,
+\label{eq:enom}
+\end{equation}
+where $\varphi$ inflates the straight-line distance to allow for obstacle avoidance. The reserve is the return energy plus a landing allowance $P(0,m)T_l$ and, while the parcel is still on board, a committed drop allowance $P(\lVert\hat w_t\rVert,m)T_d$. Four reserve rules are compared. The fixed rules multiply $\hat E(\hat w_t)$ by $1.2$ or $1.5$, the usual practice of a constant margin. The split-conformal rule calibrates three constants on nominal flights held out from training: $\hat\kappa$ and $\hat q$ are conformal quantiles of the per-step power ratio and of the along-track wind innovation, and $\hat\lambda$ is the conformal quantile of the leg-level score $E^{\mathrm{used}}/\hat E_{\mathrm{cal}}$, so that the reserve covers a $1-\delta_l$ fraction of return legs on the calibration distribution\cite{vovk2005algorithmic,angelopoulos2023gentle}. The online rule keeps the same functional form but adapts all three constants during operation:
+\begin{align}
+\kappa_{t+1} &= \Pi_{[0.9,3]}\Big(\kappa_t+\eta_\kappa\big(\mathbb{1}[r_t>\kappa_t]-\delta_\kappa\big)\Big), &
+q_{t+1} &= \Pi_{[0,15]}\Big(q_t+\eta_q\big(\mathbb{1}[\xi_t>q_t]-\delta_q\big)\Big), \label{eq:trackers}\\
+\lambda_{j+1} &= \Pi_{[0.5,4]}\Big(\lambda_j+\eta_\lambda\big(\mathrm{err}_j-\delta_l\big)\Big), &
+B_t &= \lambda\,\Big[\kappa_t \hat E(\hat w_t - q_t e) + P(0,m)T_l\Big], \label{eq:legcal}
+\end{align}
+where $r_t$ is the ratio of measured to modelled steady-flight power, $\xi_t$ is the along-track wind innovation, $\eta_\kappa=0.02$, $\delta_\kappa=0.1$, $\eta_q=0.15$, $\delta_q=0.1$, and $\mathrm{err}_j=1$ if return leg $j$ used more energy than its reserve predicted at the start of the leg or ended in depletion. The per-aircraft trackers are quantile trackers in the sense of adaptive conformal inference\cite{gibbs2021aci,angelopoulos2023pid}, while $\lambda$ is a fleet-level calibrator updated once per completed leg with $\eta_\lambda=0.05$ and target miscoverage $\delta_l=0.05$; it is shared by all aircraft operating in the same regime. A return to home is triggered whenever remaining energy falls below the reserve.
+
+\begin{proposition}[Long-run leg coverage]
+\label{prop:coverage}
+Let $\mathrm{err}_j\in\{0,1\}$ be the miscoverage indicator of return leg $j$ and let $\lambda_j$ follow \eqref{eq:legcal} without projection. Then for every horizon $J$,
+\begin{equation}
+\left|\frac{1}{J}\sum_{j=1}^{J}\mathrm{err}_j - \delta_l\right| = \frac{|\lambda_{J+1}-\lambda_1|}{\eta_\lambda J}.
+\end{equation}
+Consequently, whenever the calibrator remains in a bounded interval of width $\Lambda$, the empirical miscoverage frequency converges to the target at rate $\Lambda/(\eta_\lambda J)$, for an arbitrary and even adversarially shifting sequence of flights. With the projection $\Pi_{[0.5,4]}$ the identity acquires an additive term equal to the cumulative projection displacement, which we monitor and report.
+\end{proposition}
+
+\begin{proof}
+Summing the update gives $\lambda_{J+1}=\lambda_1+\eta_\lambda\sum_{j\le J}(\mathrm{err}_j-\delta_l)$, and rearranging yields the identity; boundedness of $\lambda$ makes the right-hand side $O(1/J)$. The argument uses no distributional assumption on the sequence, which is the defining property of adaptive conformal inference\cite{gibbs2021aci}.
+\end{proof}
+
+\subsection*{Evaluation protocol}
+
+Evaluation is paired. Every episode of every district is generated from a seed determined by the district index and the episode index, so that all policies and all reserve rules face the same layouts, customers, wind fields, battery levels, payloads and fault draws; only the trajectories differ. Each condition uses 32 districts and five episodes per district, giving 960 missions (1920 under the traffic shift) per policy, seed and condition, and policies act deterministically. Confidence intervals are cluster bootstrap intervals over episodes, pooled across the three training seeds, and we also report the spread across seeds. The base risk level $\alpha_b$ of the scheduled agents is chosen on nominal validation districts, disjoint from the test districts, by maximising the $10\%$ conditional value-at-risk of the mission return, and the conformal constants are calibrated on a further disjoint set of nominal districts. No test condition is used for any design or tuning decision.

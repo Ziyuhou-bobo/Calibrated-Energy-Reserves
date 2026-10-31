@@ -1,0 +1,42 @@
+\begin{table}[tb]
+\centering
+\caption{Return-to-home reserve rules, reported as CREST-C / SAC. Coverage is the fraction of return legs whose energy stayed within the reserve predicted at the start of the leg; the target of the conformal rules is 95\%. The fixed and split-conformal rules lose coverage as conditions drift, while the online rule holds its target and converts the residual risk into abandoned deliveries.}
+\label{tab:reserve}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+condition & reserve & coverage (\%) & depletion (\%) & abandoned (\%) & success (\%) & loss (\%) \\
+\midrule
+nominal & fixed $1.2\times$ & 61.9 / 55.1 & 0.2 / 0.4 & 1.6 / 1.1 & 91.8 / 91.9 & 6.9 / 7.2 \\
+ & fixed $1.5\times$ & 94.8 / 91.3 & 0.1 / 0.4 & 3.9 / 3.2 & 89.3 / 91.5 & 6.9 / 5.7 \\
+ & split conformal & 94.7 / 94.3 & 0.1 / 0.1 & 3.2 / 3.3 & 90.1 / 89.7 & 6.9 / 7.2 \\
+ & online conformal & 94.9 / 95.0 & 0.0 / 0.0 & 7.5 / 5.1 & 85.8 / 88.9 & 6.9 / 6.3 \\
+\addlinespace[2pt]
+wind & fixed $1.2\times$ & 50.1 / 46.4 & 1.4 / 1.5 & 5.2 / 5.5 & 85.7 / 85.8 & 10.3 / 10.3 \\
+ & fixed $1.5\times$ & 85.6 / 80.8 & 0.6 / 0.5 & 9.5 / 9.8 & 82.3 / 79.2 & 9.1 / 12.0 \\
+ & split conformal & 85.3 / 87.7 & 0.6 / 0.3 & 9.4 / 11.9 & 81.7 / 82.0 & 9.9 / 7.3 \\
+ & online conformal & 94.7 / 94.6 & 0.4 / 0.3 & 16.6 / 16.9 & 75.1 / 74.0 & 9.3 / 10.8 \\
+\addlinespace[2pt]
+sensor & fixed $1.2\times$ & 56.1 / 48.4 & 0.3 / 0.3 & 1.4 / 1.5 & 88.1 / 88.1 & 10.7 / 10.8 \\
+ & fixed $1.5\times$ & 88.4 / 84.3 & 0.2 / 0.0 & 3.9 / 3.5 & 85.9 / 86.7 & 10.5 / 10.2 \\
+ & split conformal & 89.1 / 88.2 & 0.1 / 0.0 & 3.4 / 3.1 & 85.6 / 87.4 & 11.2 / 9.6 \\
+ & online conformal & 94.8 / 94.5 & 0.0 / 0.1 & 7.7 / 7.1 & 80.8 / 83.6 & 11.8 / 9.6 \\
+\addlinespace[2pt]
+traffic & fixed $1.2\times$ & 60.7 / 52.6 & 0.2 / 0.3 & 1.1 / 0.9 & 84.7 / 84.2 & 14.3 / 15.1 \\
+ & fixed $1.5\times$ & 94.0 / 89.1 & 0.2 / 0.1 & 3.3 / 3.1 & 82.7 / 83.3 & 14.4 / 13.9 \\
+ & split conformal & 94.8 / 93.8 & 0.2 / 0.0 & 2.5 / 2.7 & 83.3 / 85.4 & 14.5 / 12.0 \\
+ & online conformal & 94.9 / 94.8 & 0.1 / 0.1 & 14.7 / 7.2 & 72.2 / 79.2 & 13.6 / 13.9 \\
+\addlinespace[2pt]
+energy & fixed $1.2\times$ & 41.8 / 42.7 & 5.0 / 4.0 & 31.5 / 26.6 & 60.9 / 66.9 & 12.6 / 10.7 \\
+ & fixed $1.5\times$ & 73.5 / 78.4 & 2.8 / 1.7 & 43.5 / 36.9 & 49.9 / 57.0 & 10.1 / 8.4 \\
+ & split conformal & 74.4 / 86.5 & 2.9 / 1.6 & 41.0 / 37.9 & 52.2 / 55.5 & 10.6 / 9.8 \\
+ & online conformal & 94.1 / 94.6 & 0.4 / 0.3 & 58.6 / 50.3 & 36.3 / 43.9 & 6.5 / 7.2 \\
+\addlinespace[2pt]
+compound & fixed $1.2\times$ & 47.6 / 44.5 & 2.5 / 2.6 & 11.6 / 9.9 & 75.3 / 78.3 & 16.0 / 14.5 \\
+ & fixed $1.5\times$ & 81.4 / 78.5 & 1.1 / 1.3 & 19.3 / 18.1 & 68.0 / 70.6 & 14.5 / 13.3 \\
+ & split conformal & 81.4 / 83.8 & 1.6 / 1.7 & 17.5 / 18.2 & 69.4 / 70.9 & 15.1 / 13.2 \\
+ & online conformal & 94.7 / 94.4 & 0.4 / 0.4 & 31.3 / 31.4 & 57.8 / 58.3 & 12.2 / 12.2 \\
+\addlinespace[2pt]
+\bottomrule
+\end{tabular}
+\end{table}

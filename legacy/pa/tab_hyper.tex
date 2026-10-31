@@ -1,0 +1,30 @@
+\begin{table}[tb]
+\centering
+\caption{Training and evaluation settings. All agents share the environment interface, the network size, the optimiser and the interaction budget.}
+\label{tab:hyper}
+\small
+\begin{tabular}{ll}
+\toprule
+setting & value \\
+\midrule
+parallel districts, environment steps & 16, 25{,}000 (2.4$\times10^{6}$ aircraft transitions) \\
+updates per environment step, batch & 4, 256 \\
+optimiser, learning rate & Adam, $3\times10^{-4}$ \\
+hidden layers, units & 2, 128 \\
+discount, target smoothing & 0.99, 0.005 \\
+replay capacity, warm-up & $4\times10^{5}$, 60 steps \\
+entropy target, initial temperature & $-2$ nats, 0.02 \\
+quantile atoms per critic, truncation & 25, 2 \\
+catastrophe-cost weight $\beta$, floor $\alpha_{\min}$ & 10, 0.1 \\
+fixed risk level of DSAC-CVaR & 0.25 \\
+soft-risk ramp & linear over the first 40\% of training \\
+training seeds & 3 \\
+\addlinespace[2pt]
+evaluation districts, episodes per district & 32, 5 \\
+missions per policy, seed and condition & 960 (1920 under the traffic shift) \\
+reserve trackers $\eta_\kappa,\delta_\kappa,\eta_q,\delta_q$ & 0.02, 0.1, 0.15, 0.1 \\
+leg calibrator $\eta_\lambda$, target miscoverage $\delta_l$ & 0.05, 0.05 \\
+bootstrap resamples, clustering & 400, by episode \\
+\bottomrule
+\end{tabular}
+\end{table}

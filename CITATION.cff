@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite the article and this deposit."
+title: "Simulator, code, trained policies and per-mission outcomes for: Tail-risk reinforcement learning and calibrated energy reserves for multi-UAV parcel delivery under distribution shift"
+version: "2.0"
+date-released: 2026-10-27
+doi: "10.5281/zenodo.XXXXXXX"
+license: MIT
+authors:
+  - family-names: Wang
+    given-names: Fengyan
+    affiliation: "Business School, Xi'an International University, Xi'an, China"
+  - family-names: Hou
+    given-names: Ziyu
+    affiliation: "Chongqing Institute of East China Normal University, Chongqing, China"
+keywords:
+  - multi-UAV parcel delivery
+  - distributional reinforcement learning
+  - conditional value-at-risk
+  - conformal prediction
+  - energy reserve
+  - distribution shift

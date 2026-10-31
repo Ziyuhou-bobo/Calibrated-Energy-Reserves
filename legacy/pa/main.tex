@@ -1,0 +1,155 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx,booktabs,caption,xcolor,microtype,array,tabularx}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage{url}
+\captionsetup{font=small,labelfont=bf,justification=justified,singlelinecheck=false}
+\theoremstyle{definition}
+\newtheorem{proposition}{Proposition}
+\setlength{\parskip}{2pt}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\arraystretch}{1.02}
+\graphicspath{{figs/}{../figs/outA/}}
+\input{data/macros.tex}
+
+\title{\vspace{-1.2cm}\bfseries Tail-Risk Reinforcement Learning and Calibrated Energy Reserves for Multi-UAV Parcel Delivery under Distribution Shift}
+\author{Ali Ahmadian\\[2pt]
+\small Decisions Lab, Department of Mechanical, Energy and Management Engineering,\\
+\small Mediterranea University of Reggio Calabria, Reggio Calabria, Italy\\
+\small School of Engineering and Technology, Central Queensland University, Melbourne, Australia\\
+\small \texttt{ahmadian.hosseini@gmail.com}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Parcel delivery by uncrewed aircraft is limited by rare events rather than by average performance, and the prevailing response in the learning literature is to optimise a tail statistic of the return distribution. We test whether that helps. We build a stochastic multi-UAV delivery environment with wind, turbulence and gusts, satellite-navigation drift and multipath, cooperative and non-cooperative traffic, and uncertain battery energy, payload and propulsion faults, in which four shift families can be applied independently at test time, and we train six policies under a matched budget with three seeds each, evaluating them on paired scenarios. Three tail-risk designs, including a hazard-adaptive risk level driven by collision threat, energy margin, traffic density and disturbance intensity, do not deliver a reliable reduction in catastrophic losses relative to a risk-neutral soft actor-critic: the gaps stay within bootstrap intervals, change sign across conditions and match the spread across training seeds. Moving the deployment risk level towards caution leaves collision rates unchanged. An online conformal return-to-home reserve, by contrast, holds its specified coverage of return-flight energy in every condition, where fixed margins lose a third of theirs, and removes energy depletion under a battery and payload shift. We quantify the resulting abort--depletion frontier and identify undetected aircraft conflicts as the dominant residual risk.
+\end{abstract}
+
+\input{sec_intro_lit.tex}
+\input{sec_intro_contrib.tex}
+
+\input{sec_methods.tex}
+
+\input{sec_results.tex}
+
+\input{sec_discussion.tex}
+
+\input{sec_conclusion.tex}
+
+\section*{Data availability}
+The simulated data generated and analysed in this study, comprising the mission-level and leg-level records of all evaluations reported here, are produced by the released code with the seeds stated in the Methods and are available from the author on reasonable request.
+
+\section*{Code availability}
+The simulator, the learning agents, the conformal reserve implementation and the analysis and figure scripts are available from the author on reasonable request and will be deposited in a public repository with a digital object identifier on publication.
+
+\section*{Author contributions}
+A.A. designed the study, implemented the simulator, agents and analysis, produced the figures and wrote the manuscript.
+
+\section*{Competing interests}
+The author declares no competing interests.
+
+\input{refs.tex}
+
+\clearpage
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_schematic.pdf}
+\caption{Structure of the study. A fleet flies deliveries in a stochastic urban district; hazard cues computed from the same observations set a risk level that conditions both actor and critics, and an online conformal reserve decides when an aircraft must abandon its delivery and return. Every policy is evaluated under every reserve rule so that policy effects and reserve effects can be separated.}
+\label{fig:schematic}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_map.pdf}
+\caption{One example scenario under the sensor shift, with buildings in grey, pads as squares, customers as diamonds, intruder tracks dotted and fleet trajectories coloured by aircraft. Crosses mark collisions. The two panels show the same scenario flown by two policies; single scenarios are illustrative and do not reflect the aggregate rates in Table~\ref{tab:main}.}
+\label{fig:map}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_power.pdf}
+\caption{Energy model. (a) Electrical power against airspeed for four payloads. (b) Energy per kilometre of ground track under along-track wind, with the energy-optimal airspeed from the candidate set marked. (c) Nominal energy for a one-kilometre return leg using a fixed cruise speed and using the energy-optimal airspeed, with the selected airspeed on the right axis.}
+\label{fig:power}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_learn.pdf}
+\caption{Training curves on the nominal distribution, mean and standard deviation over three seeds: (a) delivery success, (b) collisions, (c) mean mission return. All off-policy agents converge to a similar level; PPO is sample-limited at this budget.}
+\label{fig:learn}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_main.pdf}
+\caption{Catastrophic loss rate, the fraction of missions ending in a collision, an energy depletion or an airspace exit, for six policies in six conditions, with (a) the conventional fixed reserve and (b) the online conformal reserve. Whiskers are 95\% cluster bootstrap intervals over episodes, pooled across three seeds.}
+\label{fig:main}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_sev.pdf}
+\caption{Catastrophic loss rate against shift severity for each family, with the fixed reserve. The ordering of policies is set by the learning algorithm rather than by risk sensitivity, and no tail-risk design separates from the risk-neutral agents as severity grows.}
+\label{fig:sev}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_dial.pdf}
+\caption{Deployment risk dial of the risk-conditioned CREST-C policy: (a) collisions, (b) catastrophic loss and (c) delivery time as the base risk level is moved from cautious to risk neutral. Caution does not buy fewer collisions.}
+\label{fig:dial}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_abl.pdf}
+\caption{Risk-regulation ablations under the online conformal reserve for (a) the catastrophe-cost form of the tail measure and (b) the return form. Replacing the hazard-adaptive schedule by a constant risk level, dropping the energy cue, keeping only proximity, or driving the risk level from the spread of the learned return distribution all change the loss rate by about a percentage point.}
+\label{fig:abl}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=0.66\textwidth]{fig_alphaA.pdf}
+\caption{Hazard cues and the scheduled risk level along one delivery under the sensor shift. The schedule responds as intended, tightening the risk level near conflicts and when the energy margin falls; the behavioural consequence, however, is hesitancy rather than wider separation.}
+\label{fig:alpha}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_extra.pdf}
+\caption{Anatomy of the residual risk with the fixed reserve. (a) Distribution of the minimum air clearance achieved per mission under the traffic shift; the dashed line is contact. (b) Collisions decomposed into aircraft encounters (filled) and building strikes (outline). (c) Energy against delivery time for every policy across the six conditions.}
+\label{fig:extra}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_cov.pdf}
+\caption{Return-to-home reserves under the CREST-C policy: (a) fraction of return legs whose energy stayed within the reserve, with the 95\% target marked, (b) energy depletion losses and (c) deliveries abandoned. Fixed margins lose coverage as conditions drift; the conformal reserve holds its target and converts residual energy risk into abandoned deliveries.}
+\label{fig:cov}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_lam.pdf}
+\caption{Online calibration. (a) The fleet-level calibrator adapts within a few hundred completed return legs, settling at a higher value under the energy shift than at nominal. (b) The realised miscoverage frequency approaches the 5\% target, as Proposition~\ref{prop:coverage} predicts.}
+\label{fig:lam}
+\end{figure}
+
+\begin{figure}[p]
+\centering\includegraphics[width=\textwidth]{fig_pareto.pdf}
+\caption{Abandoned deliveries against energy depletion for fixed margins from $1.0\times$ to $2.5\times$ and for conformal reserves with target miscoverage from 2\% to 30\%, with the soft actor-critic policy. Labels give the margin or the target. The conformal family is preferable at low-depletion operating points at nominal and under the energy shift, but not under the wind shift.}
+\label{fig:pareto}
+\end{figure}
+
+\clearpage
+\input{tab_env.tex}
+\input{tab_hyper.tex}
+\input{tab_compare.tex}
+\clearpage
+\input{tab_main.tex}
+\input{tab_online.tex}
+\input{tab_reserve.tex}
+\input{tab_abl.tex}
+\input{tab_sev.tex}
+\input{tab_dial.tex}
+\input{tab_par.tex}
+
+\end{document}

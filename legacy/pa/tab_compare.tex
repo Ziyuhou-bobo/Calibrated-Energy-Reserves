@@ -1,0 +1,22 @@
+\begin{table}[tb]
+\centering
+\caption{Where this study sits relative to representative risk-sensitive and calibration-based approaches for autonomous navigation.}
+\label{tab:compare}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X*{5}{>{\centering\arraybackslash}p{1.95cm}}@{}}
+\toprule
+approach & tail-risk objective & risk level adapted online & energy feasibility & multi-agent traffic & shift held out at test \\
+\midrule
+Risk-conditioned distributional SAC\cite{choi2021rcdsac} & yes & conditioned, not adapted & no & no & no \\
+Worst-case soft actor-critic\cite{yang2021wcsac} & yes & no & no & no & no \\
+Adaptive risk tendency\cite{liu2023art,wang2025adaptive} & yes & return spread & no & no & partly \\
+Automatic and online risk adaptation\cite{schubert2021ara,wu2026drlora} & yes & uncertainty & no & no & partly \\
+Distributional marine navigation\cite{huang2025usv,wang2026diqn,lin2023usv} & yes & distance or spread & no & partly & partly \\
+Risk-sensitive multi-agent value factorisation\cite{qiu2021rmix,shen2023riskq} & yes & no & no & yes & no \\
+Conformal planning and control\cite{lindemann2023safe,dixit2023adaptive,yao2025crowd} & no & n/a & no & partly & yes \\
+Energy-aware delivery routing\cite{cheng2020energy,thibbotuwawa2020weather} & no & n/a & yes & no & partly \\
+This study & yes, three forms & four hazard cues & calibrated reserve & yes & four families \\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,55 @@
+\begin{table}[tb]
+\centering
+\caption{Mission outcomes with the conventional fixed $1.2\times$ return-to-home reserve. Rates are percentages of missions, pooled over three training seeds and about 2900 missions per policy and condition (5800 under the traffic shift). Loss is the catastrophic loss rate: collision, energy depletion or airspace exit. Energy is the mean consumption per mission.}
+\label{tab:main}
+\small
+\begin{tabular}{llrrrrrrrr}
+\toprule
+condition & policy & success & collision & aircraft & building & depletion & abandoned & loss & energy \\
+ &  & (\%) & (\%) & (\%) & (\%) & (\%) & (\%) & (\%) & (kJ) \\
+\midrule
+nominal & SAC & 91.9 & 6.5 & 5.0 & 1.4 & 0.4 & 1.1 & 7.2 & 18.0 \\
+ & TD3 & 89.8 & 8.6 & 6.8 & 1.8 & 0.3 & 1.1 & 9.2 & 18.5 \\
+ & PPO & 54.1 & 38.9 & 7.8 & 31.0 & 1.1 & 7.3 & 40.7 & 18.6 \\
+ & DSAC-N & 92.6 & 6.4 & 5.1 & 1.3 & 0.1 & 0.8 & 6.7 & 17.2 \\
+ & DSAC-CVaR & 91.5 & 7.6 & 6.1 & 1.5 & 0.1 & 0.9 & 7.7 & 17.4 \\
+ & CREST-C & 91.8 & 6.6 & 4.6 & 1.9 & 0.2 & 1.6 & 6.9 & 17.6 \\
+\addlinespace[2pt]
+wind & SAC & 85.8 & 8.1 & 5.0 & 3.1 & 1.5 & 5.5 & 10.3 & 19.2 \\
+ & TD3 & 82.1 & 11.6 & 6.9 & 4.6 & 1.7 & 5.2 & 14.0 & 19.4 \\
+ & PPO & 46.5 & 41.0 & 9.4 & 31.5 & 3.2 & 13.3 & 44.9 & 19.4 \\
+ & DSAC-N & 86.5 & 9.5 & 6.7 & 2.9 & 0.7 & 3.9 & 10.5 & 18.3 \\
+ & DSAC-CVaR & 85.2 & 10.3 & 7.8 & 2.4 & 0.8 & 4.4 & 11.2 & 18.5 \\
+ & CREST-C & 85.7 & 8.9 & 4.6 & 4.2 & 1.4 & 5.2 & 10.3 & 18.8 \\
+\addlinespace[2pt]
+sensor & SAC & 88.1 & 10.3 & 6.4 & 3.9 & 0.3 & 1.5 & 10.8 & 18.1 \\
+ & TD3 & 88.0 & 9.8 & 5.2 & 4.7 & 0.7 & 1.7 & 10.7 & 18.9 \\
+ & PPO & 53.1 & 40.0 & 7.4 & 32.6 & 1.4 & 7.7 & 41.8 & 19.0 \\
+ & DSAC-N & 87.2 & 11.8 & 7.7 & 4.2 & 0.3 & 0.8 & 12.2 & 17.1 \\
+ & DSAC-CVaR & 88.3 & 10.8 & 6.9 & 3.8 & 0.2 & 1.0 & 11.0 & 17.5 \\
+ & CREST-C & 88.1 & 10.4 & 5.3 & 5.1 & 0.3 & 1.4 & 10.7 & 17.6 \\
+\addlinespace[2pt]
+traffic & SAC & 84.2 & 14.7 & 13.2 & 1.5 & 0.3 & 0.9 & 15.1 & 17.2 \\
+ & TD3 & 81.7 & 17.0 & 14.3 & 2.7 & 0.4 & 1.0 & 17.6 & 17.4 \\
+ & PPO & 48.6 & 47.4 & 17.0 & 30.4 & 0.7 & 4.5 & 48.4 & 16.7 \\
+ & DSAC-N & 82.8 & 16.7 & 15.3 & 1.3 & 0.1 & 0.4 & 16.8 & 15.9 \\
+ & DSAC-CVaR & 83.7 & 15.6 & 13.9 & 1.7 & 0.3 & 0.7 & 15.8 & 16.4 \\
+ & CREST-C & 84.7 & 14.1 & 11.9 & 2.2 & 0.2 & 1.1 & 14.3 & 16.6 \\
+\addlinespace[2pt]
+energy & SAC & 66.9 & 6.2 & 4.1 & 2.1 & 4.0 & 26.6 & 10.7 & 19.6 \\
+ & TD3 & 65.0 & 7.6 & 5.2 & 2.4 & 4.8 & 26.8 & 12.7 & 19.9 \\
+ & PPO & 29.7 & 36.2 & 8.0 & 28.3 & 5.6 & 37.9 & 42.3 & 19.0 \\
+ & DSAC-N & 69.2 & 8.3 & 6.1 & 2.2 & 2.9 & 22.6 & 11.4 & 18.5 \\
+ & DSAC-CVaR & 68.4 & 8.2 & 5.4 & 2.7 & 3.1 & 24.1 & 11.3 & 19.0 \\
+ & CREST-C & 60.9 & 7.3 & 5.1 & 2.2 & 5.0 & 31.5 & 12.6 & 19.5 \\
+\addlinespace[2pt]
+compound & SAC & 78.3 & 11.6 & 8.5 & 3.1 & 2.6 & 9.9 & 14.5 & 19.1 \\
+ & TD3 & 74.1 & 14.9 & 11.5 & 3.4 & 3.0 & 10.3 & 18.3 & 19.3 \\
+ & PPO & 40.2 & 43.2 & 12.3 & 30.9 & 4.6 & 19.1 & 48.0 & 18.7 \\
+ & DSAC-N & 78.3 & 13.9 & 11.2 & 2.7 & 1.6 & 7.8 & 15.6 & 17.9 \\
+ & DSAC-CVaR & 77.8 & 14.2 & 11.1 & 3.1 & 1.8 & 8.2 & 16.0 & 18.2 \\
+ & CREST-C & 75.3 & 13.3 & 9.7 & 3.6 & 2.5 & 11.6 & 16.0 & 18.5 \\
+\addlinespace[2pt]
+\bottomrule
+\end{tabular}
+\end{table}

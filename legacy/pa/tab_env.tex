@@ -1,0 +1,35 @@
+\begin{table}[tb]
+\centering
+\caption{Environment parameters. The nominal column is the training distribution; the shifted column is the setting reached at severity $s=1$ of the corresponding family. Parameters not listed are identical in both.}
+\label{tab:env}
+\small
+\begin{tabular}{llll}
+\toprule
+family & parameter & nominal & shifted \\
+\midrule
+--- & district side, pads, buildings & 1600 m, 4, 30 & --- \\
+--- & building radius & 15--40 m & --- \\
+--- & cruise limits $v_{\max}$, $a_{\max}$ & 20 m s$^{-1}$, 6 m s$^{-2}$ & --- \\
+--- & mission range & 600--1100 m & --- \\
+--- & drop and landing time & 10 s, 8 s & --- \\
+--- & horizon, step & 300 s, 1 s & --- \\
+\addlinespace[2pt]
+wind & mean wind & 0--6 m s$^{-1}$ & 5--10 m s$^{-1}$ \\
+wind & turbulence scale & $0.3+0.17\lVert\bar w\rVert$ & $0.3+0.25\lVert\bar w\rVert$ \\
+wind & gust rate, amplitude & 1/150 s$^{-1}$, 3--8 m s$^{-1}$ & 1/60 s$^{-1}$, 5--10 m s$^{-1}$ \\
+\addlinespace[2pt]
+sensor & navigation error & 2 m & 5 m \\
+sensor & multipath probability, offset & 0.005, 8--20 m & 0.03, 15--40 m \\
+sensor & wind measurement noise & 1 m s$^{-1}$ & 2 m s$^{-1}$ \\
+sensor & intruder miss probability & 0.05 & 0.20 \\
+\addlinespace[2pt]
+traffic & fleet size, intruders & 6, 4 & 12, 10 \\
+traffic & intruder speed, turn rate & 4--10 m s$^{-1}$, 0.01 & 6--14 m s$^{-1}$, 0.03 \\
+\addlinespace[2pt]
+energy & usable battery energy & 24--50 kJ & 18--40 kJ \\
+energy & payload mass & 0.2--1.2 kg & 1.0--1.8 kg \\
+energy & fault rate & 1/3000 s$^{-1}$ & 1/750 s$^{-1}$ \\
+energy & fault power multiplier, energy drop & 1.25--1.6, 5--15\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
